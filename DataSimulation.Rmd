@@ -22,10 +22,19 @@ generateDataset<-function(N){
   bmi<-0
   sitting<-0
   data.frame(age,canc,cvd,diab,hbp,education,smoke,functional.limitation,physical.activity,bmi,sitting)
+  
+  # Age was normally distributed given the mean and standard deviation
   age<-rnorm(N,55.6,5.4)
+  
+  # Education was a factor variable with different levels of education 
+  # 0= none, 1=School Certificate, 2= High School, 3= Trade 4= Certificate/diploma 5= University degree
   education<-factor(sample(0:5, N, replace=TRUE, prob=c(0.07, 0.128, 0.104, 0.172,0.21,0.317)),ordered=T, 
                     levels=c('0','1','2','3','4','5'))
+  # Smoke as binary variable of did or did not smoke
   smoke<-rbinom(N,1,0.48)
+  
+  # Functional limitation as factor with 4 levels
+  # 0= no limitation , 1 = mild limitation, 2= mod limitation, 3 = severe limitation
   
   functional.limitation<-factor(sample(0:3, N, replace=TRUE, prob=c(0.445,0.205, 0.169, 0.181)),ordered=T,
                                 levels= c('0','1','2','3'))
@@ -37,6 +46,16 @@ generateDataset<-function(N){
   length.mod<-length(mod)
   severe<-which(functional.limitation==3)
   length.severe<-length(severe)
+  
+  # Sitting is a factor variable with 4 levels
+  # Level 1 = 0 to < 4 hours of sitting
+  # Level 2 = 4 to < 6 hours of sitting
+  # Level 3 = 6 to < 8 hours of sitting
+  # Level 4 = >= 8 hours of sitting
+  
+  # This variable is correalted with the amount if functional limitation as people with more limitation with sit 
+  # for longer hours. This variable was simulated using the functional limitation indices and randomly assigning 
+  # them to different levels based on domain knowledge
   
   sitting <- factor( rep("level4",N), ordered=T,levels =c("level1", "level2", "level3", "level4"))
   mod1<-sample(mod,round(length(mod)*0.35),replace = FALSE)
@@ -53,13 +72,23 @@ generateDataset<-function(N){
   mod3<-sample(subset(mod, !(mod %in% c(mod1,mod2)),round(length.mod*0.75),replace = FALSE))
   no3<-sample(subset(no, !(no %in% c(no1,no2))),round(length.no*0.35),replace = FALSE)
   sitting[c(mod3,no3)]<- "level3"
+  
+  # The chronic conditions diabetes, canc, cvd and hbp wa simulated using logistic function to take into account 
+  # of age and level of sitting 
 
   logistic <- function(t) 1 / (1 + exp(-t))
   canc <- runif(length(age))< .05*logistic((age-50)/10) + .065*logistic((as.numeric(sitting)-3)/2)
   cvd<- runif(length(age))< .06*logistic((age-45)/2) + .07*logistic((as.numeric(sitting)-3)/2)
   diab <- runif(length(age))< .07*logistic((age-50)/10) + .086*logistic((as.numeric(sitting)-3)/2)
-  hbp <- runif(length(age))< .4*logistic((age-45)/10) +.06*logistic((as.numeric(sitting)-3)/2)
+  hbp <- runif(length(age))< .2*logistic((age-45)/2) +.2*logistic((as.numeric(sitting)-3)/2)
 
+  # Physical activity is a factor variable with 4 levels. This level is again dependent os the functional          #limitation. More the functional limitation, less the the level of physical activity. This was divided based
+  # on the minutes people spend with physical activity 
+  # Sed (zero mins) 
+  # Low Active(0-149 mins)
+  #Sufficiently active(150-299 mins)
+  #Highly active(300- 539 mins)
+  # Very highly active( 540 + mins)
   
   physical.activity <- factor( rep("veryhigh",N), ordered=T,levels =c("sed", "low", "suff", "high", "veryhigh"))
   low.mod1<-sample(mod,round(length(mod)*0.8),replace = FALSE)
@@ -80,8 +109,9 @@ generateDataset<-function(N){
   severe.no4<-sample(subset(no, !(no %in% c(low.no1,suff.no2,high.no3)),round(length.no*0.1),replace = FALSE))
   physical.activity[c(severe.sed,severe.no4)]<-"sed"
   
-  
-  bmi<- factor( rep("obese",N), ordered=T,levels =c("underweight","normalweight", "overweight","obese"))
+  # BMI was factor variable with 4 levels of underweight, normal weight, overweight and obese.This
+  # variable is also correalted with the level of physical activity. Lower level of physical activity, higher the   # BMI
+  bmi<- factor( rep("normalweight",N), ordered=T,levels =c("underweight","normalweight", "overweight","obese"))
   
   sed<-which(physical.activity=="sed")
   length.sed<-length(sed)
@@ -98,18 +128,20 @@ generateDataset<-function(N){
   veryhigh1<-sample(veryhigh,round(length.veryhigh*0.015),replace = FALSE)
   bmi[c(high1,veryhigh1)]<-"underweight"
   
-  high2<-sample(subset(high, !(high %in% high1)),round(length.high*0.75),replace = FALSE)
-  veryhigh2<-sample(subset(veryhigh, !(veryhigh %in% veryhigh1)),round(length.veryhigh*0.5),replace = FALSE)
-  low2<-sample(low,round(length.low*0.05),replace = FALSE)
-  sed2<-sample(sed,round(length.sed*0.05),replace = FALSE)
-  suff2<-sample(suff,round(length.suff*0.25),replace = FALSE)
-  bmi[c(high2,veryhigh2,low2,sed2,suff2)]<-"normalweight"
+  high2<-sample(subset(high, !(high %in% high1)),round(length.high*0.05),replace = FALSE)
+  veryhigh2<-sample(subset(veryhigh, !(veryhigh %in% veryhigh1)),round(length.veryhigh*0.05),replace = FALSE)
+  low2<-sample(low,round(length.low*0.6),replace = FALSE)
+  sed2<-sample(sed,round(length.sed*0.7),replace = FALSE)
+  suff2<-sample(suff,round(length.suff*0.2),replace = FALSE)
+  bmi[c(high2,veryhigh2,low2,sed2,suff2)]<-"obese"
   
-  
+  low3<-sample(subset(low, !(low %in% low2),round(length.low*0.1),replace = FALSE))
   sed3<-sample(subset(sed, !(sed %in% sed2),round(length.sed*0.1),replace = FALSE))
   suff3<-sample(subset(suff, !(suff %in% c(suff2)),round(length.suff*0.10),replace = FALSE))
-  bmi[c(sed3,suff3)]<-"overweight"
+  bmi[c(sed3,suff3,low3)]<-"overweight"
   
+  # In all the above variables, some noise was added as some individuals may over report or underreport
+  # Their hours of sitting, physical activity
   data.frame(age,canc,cvd,diab,hbp,education,smoke,functional.limitation,physical.activity,bmi,sitting)
 }
 ```
@@ -170,40 +202,50 @@ summary(model1)
 The model on the whole is significant and level 4 of sitting is slightly significant to increase the odds of developing cancer by a factor of 0.3 and level 3 by a factor of 0.2
 
 ```{r}
-model2<-glm(formula = diab~sitting + age, family = binomial(),data = data)
+model2<-glm(formula = diab~sitting, family = binomial(),data = data)
 summary(model2)
 ```
 
-Diabetes is highly correlated with all levels of sitting. On observing the coefficents we can see that the odds of developing diabetes increases as the level of sitting increases. The coefficents of higher level of sitting is more than age
+Diabetes is highly correlated with all levels of sitting. On observing the coefficents we can see that the odds of developing diabetes increases as the level of sitting increases. The coefficents of higher level of sitting is
+almost 3 times of level 2 sitting
 
 ```{r}
 model3<-glm(formula = cvd~sitting , family = binomial(),data = data)
 summary(model3)
 ```
-Higher level of sitting is associated with higher probability of developing cardiovascular disease. The coefficent of level 4 sitting is almost 3 times as compared to level 2
+Higher level of sitting is associated with higher probability of developing cardiovascular disease. The coefficent of level 4 sitting is almost  0.2 ie sitting for greater than 8 hours increases the log odd of developing cardiovascular disease by a factor of 0.24, whereas level 3 sitting(6 to < 8 hrs of sitting) increases th odds y a factor of 0.16
 
 
 ```{r}
 model4<-glm(formula = hbp~sitting, family = binomial(),data = data)
 summary(model4)
 ```
-Sitting for greater than 8 hours increases the odds of developing high blood pressure by a factor of 0.06
+
+Sitting for greater than 8 hours increases the odds of developing high blood pressure by a factor of 0.35, level 3 sitting increases the odds by 0.23, level 2 sitting increases the odds by 0.11
+
 
 ```{r}
 data$chronic.disease<-as.factor(ifelse(data$chronic.disease==0,0,1))
-model5<- glm(chronic.disease~sitting + age + physical.activity + functional.limitation,family = binomial(),data=data)
+model5<- glm(chronic.disease~sitting,family = binomial(),data=data)
 summary(model5)
 ```
+The above model, clearly shows that sitting hours is correlated with the development of chronic diseases. Higher the hours of sitting high the odds of developing chronic diseases
 
-Based on the above summary, we can see that the higher level of sitting and age are the significant variables increasing the odds of developing chronic disease
 
 ```{r}
-model6<- glm(chronic.disease~sitting + age ,family = binomial(),data=data)
+data$functional.limitation<-factor(data$functional.limitation, ordered=FALSE)
+data$physical.activity<-factor(data$physical.activity, ordered=FALSE)
+
+model6<- glm(chronic.disease~sitting + age + physical.activity + functional.limitation + smoke,family = binomial(),data=data)
 summary(model6)
 ```
 
-
-The above is a better model with removal of the completely non relevant varaibles
+Based on the above summary, we can see that the higher level of sitting and age are the significant variables increasing the odds of developing chronic disease. Though age was added to the model to predict chronic diseases, it did not decrease the impact of sitting level on the development of chronic diseases.Physical activity and functional limitations did not conrtribute to the development of chronic diseases.Even smoking which is found to be high risk for chronic diseases like canc, cardiovascular diseases was not as significant as sitting.
 
 Conclusion:
 Higher level of sitting hours increases the odds of developing chronic conditions. The number of chronic conditions reported also increases as the amount of sitting hours increases. It is important for individuals with higher level of sitting to increase the level of physical activity, to decrease the chances of developing chronic conditions. Regular breaks every hour of sitting is found the decrease the risk significantly.
+
+Limitations:
+As the study was cross-sectional in nature, we cannot establish whether the volume of sitting time led to the development of these chronic diseases, or whether the presence of these chronic diseases influenced participants' sitting time.
+The potential for misclassification of the variables used in this analysis must be acknowledged. It is possible that some participants may have incorrectly reported (or failed to report) having a chronic disease, while others may have under- or over-reported their daily sitting time. While these potential misclassifications may have impacted upon the strength of the observed associations, even after adjusting for a range of covariates, sitting time was still strongly and significantly associated with development of chronic diseases. 
+In addition, only data on overall time spent in physical activity in the previous week were included in this study. It is also possible that a proportion of the moderate intensity activity reported in the 45 and Up Study baseline questionnaire was actually light intensity, which may have led to an overestimation of moderate intensity physical activity. The third potential limitation is that the sitting time variables did not delineate specific domains of sitting time, such as office work, driving, other passive travel, and sitting during leisure time.
