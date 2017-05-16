@@ -242,11 +242,11 @@ summary(model6)
 
 Based on the above summary, we can see that the higher level of sitting and age are the significant variables increasing the odds of developing chronic disease. Though age was added to the model to predict chronic diseases, it did not decrease the impact of sitting level on the development of chronic diseases.Physical activity and functional limitations did not conrtribute to the development of chronic diseases.Even smoking which is found to be high risk for chronic diseases like canc, cardiovascular diseases was not as significant as sitting.
 
-###Conclusion
+###Conclusion <br />
 Higher level of sitting hours increases the odds of developing chronic conditions. The number of chronic conditions developed also increases as the amount of sitting hours increases.<br />
 It is important for individuals with higher level of sitting to increase the level of physical activity, to decrease the chances of developing chronic conditions. Regular breaks every hour of sitting is found the decrease the risk significantly.
 
-###Limitations
+###Limitations <br ?>
 As the study was cross-sectional in nature, we cannot establish whether the volume of sitting time led to the development of these chronic diseases, or whether the presence of these chronic diseases influenced participants' sitting time.<br />
 The potential for misclassification of the variables used in this analysis must be acknowledged. It is possible that some participants may have incorrectly reported (or failed to report) having a chronic disease, while others may have under- or over-reported their daily sitting time. While these potential misclassifications may have impacted upon the strength of the observed associations, even after adjusting for a range of covariates, sitting time was still strongly and significantly associated with development of chronic diseases.<br /> 
 In addition, only data on overall time spent in physical activity in the previous week were included in this study. It is also possible that a proportion of the moderate intensity activity reported in the 45 and Up Study baseline questionnaire was actually light intensity, which may have led to an overestimation of moderate intensity physical activity. The third potential limitation is that the sitting time variables did not delineate specific domains of sitting time, such as office work, driving, other passive travel, and sitting during leisure time.
